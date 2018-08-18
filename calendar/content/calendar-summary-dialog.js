@@ -154,12 +154,14 @@ exchEventSummaryDialog.prototype = {
         var attendees = item.getAttendees({});
         var optionalAttendeeList = new Array();
         var requiredAttendeeList = new Array();
-        for each(var attendee in attendees) {
-            if (attendee.role == "OPT-PARTICIPANT") {
-                optionalAttendeeList.push(attendee);
-            }
-            else {
-                requiredAttendeeList.push(attendee);
+        if (attendees) {
+            for (var attendee of Object.values(attendees)) {
+                if (attendee.role == "OPT-PARTICIPANT") {
+                    optionalAttendeeList.push(attendee);
+                }
+                else {
+                    requiredAttendeeList.push(attendee);
+                }
             }
         }
 
@@ -201,7 +203,8 @@ exchEventSummaryDialog.prototype = {
         var list = listbox.getElementsByTagName("listitem");
         var page = 0;
         var line = 0;
-        for each(var attendee in attendees) {
+        if (attendees) {
+            for (var attendee of Object.values(attendees)) {
                 var itemNode = list[line];
                 var listcell = itemNode.getElementsByTagName("listcell")[page];
                 if (attendee.commonName && attendee.commonName.length) {
@@ -221,6 +224,7 @@ exchEventSummaryDialog.prototype = {
                 }
 
             } //end of for
+        }
 
     },
 
@@ -449,7 +453,7 @@ exchEventSummaryDialog.prototype = {
         //dump("this.inlineImages.length:"+this.inlineImages.length+"\n");
 
         if (aAttachments.length > 0) {
-            for (var index in aAttachments) {
+            for (var index of aAttachments) {
                 if (aAttachments[index].contentId) {
                     // Find the image this attachment is for.
                     for (var i = 0; i < this.inlineImages.length; i++) {
@@ -548,7 +552,7 @@ exchEventSummaryDialog.prototype = {
             if (calendar.getProperty("exchWebService.offlineOrNotConnected")) {
                 var tmpArray = tmpButtons.split(",");
                 var newArray = [];
-                for (var index in tmpArray) {
+                for (var index of tmpArray) {
                     if (tmpArray[index] != "extra1") {
                         newArray.push(tmpArray[index]);
                     }
@@ -683,8 +687,10 @@ exchEventSummaryDialog.prototype = {
 
     unLoad: function _unLoad(aEvent) {
         //dump("unLoading window:"+aEvent.type+"\n");
-        for each(var cachedImage in this.imageCache) {
-            cachedImage.remove(false);
+        if (this.imageCache) {
+            for (var cachedImage of Object.values(this.imageCache)) {
+                cachedImage.remove(false);
+            }
         }
     },
 }

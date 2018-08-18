@@ -116,7 +116,7 @@ mivExchangeTodo.prototype = {
             this._billingInformation = aItem._billingInformation;
             this._companies = [];
             if (aItem._companies) {
-                for each(var company in aItem._companies) {
+                for (var company of Object.values(aItem._companies)) {
                     this._companies.push(company);
                 }
             }
@@ -734,13 +734,15 @@ mivExchangeTodo.prototype = {
                 .createInstance(Ci.mivIxml2jxon);
             var categories = this.getCategories({});
             var first = true;
-            for each(var category in categories) {
-                if (first) {
-                    first = false;
-                    categoriesXML.processXMLString("<t:String>" + category + "</t:String>", 0, null);
-                }
-                else {
-                    categoriesXML.addSibblingTag("String", "t", category);
+            if (categories) {
+                for (var category of Object.values(categories)) {
+                    if (first) {
+                        first = false;
+                        categoriesXML.processXMLString("<t:String>" + category + "</t:String>", 0, null);
+                    }
+                    else {
+                        categoriesXML.addSibblingTag("String", "t", category);
+                    }
                 }
             }
             if (categories.length > 0) {
@@ -760,13 +762,15 @@ mivExchangeTodo.prototype = {
             var companies = this.getCompanies({});
             //var companies = this.companies;
             var first = true;
-            for each(var company in companies) {
-                if (first) {
-                    first = false;
-                    companiesXML.processXMLString("<t:String>" + company + "</t:String>", 0, null);
-                }
-                else {
-                    companiesXML.addSibblingTag("String", "t", company);
+            if (companies) {
+                for (var company of Object.values(companies)) {
+                    if (first) {
+                        first = false;
+                        companiesXML.processXMLString("<t:String>" + company + "</t:String>", 0, null);
+                    }
+                    else {
+                        companiesXML.addSibblingTag("String", "t", company);
+                    }
                 }
             }
             if (companies.length > 0) {
@@ -1148,8 +1152,10 @@ mivExchangeTodo.prototype = {
         this._companies = [];
         if (this._exchangeData) {
             var tmpStr = xml2json.XPath(this.exchangeData, "/t:Companies/t:String");
-            for each(var string in tmpStr) {
-                this._companies.push(xml2json.getValue(string));
+            if (tmpStr) {
+                for (var string of Object.values(tmpStr)) {
+                    this._companies.push(xml2json.getValue(string));
+                }
             }
             tmpStr = null;
         }

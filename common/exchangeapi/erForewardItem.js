@@ -86,16 +86,18 @@ erForewardItemRequest.prototype = {
         var forwardItem = req.addChildTag("Items", "nsMessages", null).addChildTag("ForwardItem", "nsTypes", null);
         var toRecipients = forwardItem.addChildTag("ToRecipients", "nsTypes", null);
 
-        for each(let emailId in this.argument.attendees) {
-            var email = new String(emailId);
-            var start = email.indexOf('<');
-            if (start < 0) {
-                toRecipients.addChildTag("Mailbox", "nsTypes", null).addChildTag("EmailAddress", "nsTypes", email);
-            }
-            else {
-                email = email.substr(start + 1);
-                var end = email.indexOf('>');
-                toRecipients.addChildTag("Mailbox", "nsTypes", null).addChildTag("EmailAddress", "nsTypes", email.substr(0, end));
+        if (this.argument.attendees) {
+            for (let emailId of Object.values(this.argument.attendees)) {
+                var email = new String(emailId);
+                var start = email.indexOf('<');
+                if (start < 0) {
+                    toRecipients.addChildTag("Mailbox", "nsTypes", null).addChildTag("EmailAddress", "nsTypes", email);
+                }
+                else {
+                    email = email.substr(start + 1);
+                    var end = email.indexOf('>');
+                    toRecipients.addChildTag("Mailbox", "nsTypes", null).addChildTag("EmailAddress", "nsTypes", email.substr(0, end));
+                }
             }
         }
 

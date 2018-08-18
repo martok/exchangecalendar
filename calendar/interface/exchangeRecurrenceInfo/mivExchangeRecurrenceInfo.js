@@ -403,20 +403,22 @@ mivExchangeRecurrenceInfo.prototype = {
         var recurrenceItems = this.getRecurrenceItems({});
         //this.logInfo("Going to see if we have recurrenceItems:"+recurrenceItems.length);
         var result = "";
-        for each(var ritem in recurrenceItems) {
-            //this.logInfo(" ||||| ritem:"+ritem);
-            if (ritem instanceof Ci.calIRecurrenceRule) {
-                if (ritem) {
-                    //dump(" ;;;; ritem:"+ritem.icalProperty.icalString+"\n");
+        if (recurrenceItems) {
+            for (var ritem of Object.values(recurrenceItems)) {
+                //this.logInfo(" ||||| ritem:"+ritem);
+                if (ritem instanceof Ci.calIRecurrenceRule) {
+                    if (ritem) {
+                        //dump(" ;;;; ritem:"+ritem.icalProperty.icalString+"\n");
 
-                    // RRULE:FREQ=DAILY;UNTIL=20131203T121500Z  ---> RRULE:FREQ=DAILY;UNTIL=20131203T000000Z
-                    //dump(" ---- ritem:"+ritem.icalProperty.icalString.replace(/RRULE:(.*);UNTIL=(\d*)T(\d*)Z/, "RRULE:$1;UNTIL=$2T000000Z")+"\n");
-                    result += ritem.icalProperty.icalString.replace(/RRULE:(.*);UNTIL=(\d*)T(\d*)Z/, "RRULE:$1;UNTIL=$2T000000Z");
+                        // RRULE:FREQ=DAILY;UNTIL=20131203T121500Z  ---> RRULE:FREQ=DAILY;UNTIL=20131203T000000Z
+                        //dump(" ---- ritem:"+ritem.icalProperty.icalString.replace(/RRULE:(.*);UNTIL=(\d*)T(\d*)Z/, "RRULE:$1;UNTIL=$2T000000Z")+"\n");
+                        result += ritem.icalProperty.icalString.replace(/RRULE:(.*);UNTIL=(\d*)T(\d*)Z/, "RRULE:$1;UNTIL=$2T000000Z");
+                    }
+                    else {
+                        //this.logInfo(" ;;;; ritem: null !!!!!!!!!!!!!!");
+                    }
+                    break;
                 }
-                else {
-                    //this.logInfo(" ;;;; ritem: null !!!!!!!!!!!!!!");
-                }
-                break;
             }
         }
         return result;

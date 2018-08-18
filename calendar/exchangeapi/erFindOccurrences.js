@@ -184,54 +184,58 @@ erFindOccurrencesRequest.prototype = {
 
         //var rm = aResp.XPath("/s:Envelope/s:Body/m:GetItemResponse/m:ResponseMessages/m:GetItemResponseMessage");
         var rm = xml2json.XPath(aResp, "/s:Envelope/s:Body/m:GetItemResponse/m:ResponseMessages/m:GetItemResponseMessage");
-        for each(var e in rm) {
-            var responseCode = xml2json.getTagValue(e, "m:ResponseCode");
-            switch (responseCode) {
-            case "ErrorCalendarOccurrenceIsDeletedFromRecurrence":
-                this.currentRealIndex++;
-                break;
-            case "NoError":
-                var tmpItems = xml2json.XPath(e, "/m:Items/*");
-                for each(var tmpItem in tmpItems) {
+        if (rm) {
+            for (var e of Object.values(rm)) {
+                var responseCode = xml2json.getTagValue(e, "m:ResponseCode");
+                switch (responseCode) {
+                case "ErrorCalendarOccurrenceIsDeletedFromRecurrence":
                     this.currentRealIndex++;
-                    var startDate = cal.fromRFC3339(xml2json.getTagValue(tmpItem, "t:Start"), cal.UTC()).getInTimezone(cal.UTC());
-                    var endDate = cal.fromRFC3339(xml2json.getTagValue(tmpItem, "t:End"), cal.UTC()).getInTimezone(cal.UTC());
-                    if ((this.startDate.compare(endDate) < 1)
-                        && (this.endDate.compare(startDate) > -1)) {
-                        // We found our occurrence
-                        this.items.push({
-                            Id: xml2json.getAttributeByTag(tmpItem, "t:ItemId", "Id"),
-                            ChangeKey: xml2json.getAttributeByTag(tmpItem, "t:ItemId", "ChangeKey"),
-                            type: xml2json.getTagValue(tmpItem, "t:CalendarItemType"),
-                            uid: xml2json.getTagValue(tmpItem, "t:UID"),
-                            start: xml2json.getTagValue(tmpItem, "t:Start"),
-                            end: xml2json.getTagValue(tmpItem, "t:End"),
-                            index: this.currentRealIndex
-                        });
-                    }
+                    break;
+                case "NoError":
+                    var tmpItems = xml2json.XPath(e, "/m:Items/*");
+                    if (tmpItems) {
+                        for (var tmpItem of Object.values(tmpItems)) {
+                            this.currentRealIndex++;
+                            var startDate = cal.fromRFC3339(xml2json.getTagValue(tmpItem, "t:Start"), cal.UTC()).getInTimezone(cal.UTC());
+                            var endDate = cal.fromRFC3339(xml2json.getTagValue(tmpItem, "t:End"), cal.UTC()).getInTimezone(cal.UTC());
+                            if ((this.startDate.compare(endDate) < 1)
+                                && (this.endDate.compare(startDate) > -1)) {
+                                // We found our occurrence
+                                this.items.push({
+                                    Id: xml2json.getAttributeByTag(tmpItem, "t:ItemId", "Id"),
+                                    ChangeKey: xml2json.getAttributeByTag(tmpItem, "t:ItemId", "ChangeKey"),
+                                    type: xml2json.getTagValue(tmpItem, "t:CalendarItemType"),
+                                    uid: xml2json.getTagValue(tmpItem, "t:UID"),
+                                    start: xml2json.getTagValue(tmpItem, "t:Start"),
+                                    end: xml2json.getTagValue(tmpItem, "t:End"),
+                                    index: this.currentRealIndex
+                                });
+                            }
 
-                    // When we see occurrences past our endDate range stop.
-                    if (startDate.compare(this.endDate) == 1) {
-                        finished = true;
-                        break;
+                            // When we see occurrences past our endDate range stop.
+                            if (startDate.compare(this.endDate) == 1) {
+                                finished = true;
+                                break;
+                            }
+                        }
                     }
+                    tmpItems = null;
+                    break;
+                case "ErrorItemNotFound":
+                case "ErrorCalendarOccurrenceIndexIsOutOfRecurrenceRange":
+                    finished = true;
+                    break;
+                case "ErrorInvalidIdMalformed":
+                    this.onSendError(aExchangeRequest, this.parent.ER_ERROR_FINDOCCURRENCES_INVALIDIDMALFORMED, responseCode);
+                    return;
+                default:
+                    this.onSendError(aExchangeRequest, this.parent.ER_ERROR_FINDOCCURRENCES_UNKNOWN, responseCode);
+                    return;
                 }
-                tmpItems = null;
-                break;
-            case "ErrorItemNotFound":
-            case "ErrorCalendarOccurrenceIndexIsOutOfRecurrenceRange":
-                finished = true;
-                break;
-            case "ErrorInvalidIdMalformed":
-                this.onSendError(aExchangeRequest, this.parent.ER_ERROR_FINDOCCURRENCES_INVALIDIDMALFORMED, responseCode);
-                return;
-            default:
-                this.onSendError(aExchangeRequest, this.parent.ER_ERROR_FINDOCCURRENCES_UNKNOWN, responseCode);
-                return;
-            }
 
-            if ((finished) || (found)) {
-                break; // break the loop
+                if ((finished) || (found)) {
+                    break; // break the loop
+                }
             }
         }
         rm = null;

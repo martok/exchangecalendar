@@ -138,32 +138,36 @@ erGetOccurrenceIndexRequest.prototype = {
 
         var rm = aResp.XPath("/s:Envelope/s:Body/m:GetItemResponse/m:ResponseMessages/m:GetItemResponseMessage");
 
-        for each(var e in rm) {
+        if (rm) {
+            for (var e of Object.values(rm)) {
 
-            var responseCode = e.getTagValue("m:ResponseCode");
-            switch (responseCode) {
-            case "ErrorCalendarOccurrenceIsDeletedFromRecurrence":
-                this.currentRealIndex++;
-                break;
-            case "NoError":
-                var items = e.XPath("/m:Items/*");
-                for each(var item in items) {
+                var responseCode = e.getTagValue("m:ResponseCode");
+                switch (responseCode) {
+                case "ErrorCalendarOccurrenceIsDeletedFromRecurrence":
                     this.currentRealIndex++;
-                    if (this.argument.item.id == item.getAttributeByTag("t:ItemId", "Id")) {
-                        // We found our occurrence
-                        finished = true;
-                        found = true;
-                        break;
+                    break;
+                case "NoError":
+                    var items = e.XPath("/m:Items/*");
+                    if (items) {
+                        for (var item of Object.values(items)) {
+                            this.currentRealIndex++;
+                            if (this.argument.item.id == item.getAttributeByTag("t:ItemId", "Id")) {
+                                // We found our occurrence
+                                finished = true;
+                                found = true;
+                                break;
+                            }
+                        }
                     }
+                    items = null;
+                    break;
+                case "ErrorCalendarOccurrenceIndexIsOutOfRecurrenceRange":
+                    finished = true;
                 }
-                items = null;
-                break;
-            case "ErrorCalendarOccurrenceIndexIsOutOfRecurrenceRange":
-                finished = true;
-            }
 
-            if ((finished) || (found)) {
-                break; // break the loop
+                if ((finished) || (found)) {
+                    break; // break the loop
+                }
             }
         }
         rm = null;

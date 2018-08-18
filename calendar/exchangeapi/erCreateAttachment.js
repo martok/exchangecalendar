@@ -159,13 +159,15 @@ erCreateAttachmentRequest.prototype = {
         var errorCount = 0;
         var okCount = 0;
 
-        for each(var createAttachmentResponseMessage in createAttachmentResponseMessages) {
-            if (createAttachmentResponseMessage.getAttribute("ResponseClass") != "Success") {
-                weHaveAnError = true;
-                errorCount++;
-            }
-            else {
-                okCount++;
+        if (createAttachmentResponseMessages) {
+            for (var createAttachmentResponseMessage of Object.values(createAttachmentResponseMessages)) {
+                if (createAttachmentResponseMessage.getAttribute("ResponseClass") != "Success") {
+                    weHaveAnError = true;
+                    errorCount++;
+                }
+                else {
+                    okCount++;
+                }
             }
         }
         oofSettingsResponse = null;

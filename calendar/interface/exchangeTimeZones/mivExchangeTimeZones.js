@@ -146,25 +146,27 @@ mivExchangeTimeZones.prototype = {
             var weHaveAMatch = null;
 
             var finalScore = -1;
-            for each(var timeZoneDefinition in this._timeZones[version]) {
+            if (this._timeZones[version]) {
+                for (var timeZoneDefinition of Object.values(this._timeZones[version])) {
 
-                // First we match on values.
-                var exchangeTimeZone = this.getTimeZone(timeZoneDefinition, aIndexDate);
-                if (exchangeTimeZone.equal(calTimeZone)) {
-                    // Now we see if we have also a match on name.
-                    var tmpScore = 0;
-                    for each(var zonePart in tmpArray) {
-                        if ((exchangeTimeZone.id) && (exchangeTimeZone.id.indexOf(zonePart) > -1)) {
-                            tmpScore = tmpScore + 1;
+                    // First we match on values.
+                    var exchangeTimeZone = this.getTimeZone(timeZoneDefinition, aIndexDate);
+                    if (exchangeTimeZone.equal(calTimeZone)) {
+                        // Now we see if we have also a match on name.
+                        var tmpScore = 0;
+                        for (var zonePart of tmpArray) {
+                            if ((exchangeTimeZone.id) && (exchangeTimeZone.id.indexOf(zonePart) > -1)) {
+                                tmpScore = tmpScore + 1;
+                            }
+                            if ((exchangeTimeZone.name) && (exchangeTimeZone.name.indexOf(zonePart) > -1)) {
+                                tmpScore = tmpScore + 1;
+                            }
                         }
-                        if ((exchangeTimeZone.name) && (exchangeTimeZone.name.indexOf(zonePart) > -1)) {
-                            tmpScore = tmpScore + 1;
-                        }
-                    }
 
-                    if (tmpScore > finalScore) {
-                        finalScore = tmpScore;
-                        weHaveAMatch = exchangeTimeZone;
+                        if (tmpScore > finalScore) {
+                            finalScore = tmpScore;
+                            weHaveAMatch = exchangeTimeZone;
+                        }
                     }
                 }
             }
@@ -249,7 +251,7 @@ mivExchangeTimeZones.prototype = {
         var tmpResult = null;
         while (timezones.hasMore()) {
             var tmpZoneId = timezones.getNext();
-            for each(var cname in names) {
+            for (var cname of names) {
                 if (tmpZoneId.toLowerCase().indexOf(cname) > -1) {
                     return this.timezoneService.getTimezone(tmpZoneId);
                 }
@@ -292,7 +294,7 @@ mivExchangeTimeZones.prototype = {
                 var tmpArray = calTimeZone.id.split("/");
 
                 var tmpScore = 0;
-                for each(var zonePart in tmpArray) {
+                for (var zonePart of tmpArray) {
 
                     if ((exchangeTimeZone.id) && (exchangeTimeZone.id.indexOf(zonePart) > -1)) {
                         tmpScore = tmpScore + 1;

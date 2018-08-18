@@ -114,15 +114,17 @@ erGetAttachmentsRequest.prototype = {
         }
 
         var attachments = [];
-        for each(var e in rm) {
-            attachments.push({
-                id: xml2json.getAttributeByTag(e, "t:AttachmentId", "Id"),
-                name: xml2json.getTagValue(e, "t:Name"),
-                content: xml2json.getTagValue(e, "t:Content"),
-                contentId: xml2json.getTagValue(e, "t:ContentId"),
-                contentType: xml2json.getTagValue(e, "t:ContentType"),
-                attachment: e
-            });
+        if (rm) {
+            for (var e of Object.values(rm)) {
+                attachments.push({
+                    id: xml2json.getAttributeByTag(e, "t:AttachmentId", "Id"),
+                    name: xml2json.getTagValue(e, "t:Name"),
+                    content: xml2json.getTagValue(e, "t:Content"),
+                    contentId: xml2json.getTagValue(e, "t:ContentId"),
+                    contentType: xml2json.getTagValue(e, "t:ContentType"),
+                    attachment: e
+                });
+            }
         }
         rm = null;
 

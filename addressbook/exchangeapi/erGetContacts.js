@@ -103,13 +103,15 @@ erGetContactsRequest.prototype = {
         itemids = null;
 
         var itemids = req.addChildTag("ItemIds", "nsMessages", null);
-        for each(var item in this.ids) {
-            var itemId = itemids.addChildTag("ItemId", "nsTypes", null);
-            itemId.setAttribute("Id", item.Id);
-            if (item.ChangeKey) {
-                itemId.setAttribute("ChangeKey", item.ChangeKey);
+        if (this.ids) {
+            for (var item of Object.values(this.ids)) {
+                var itemId = itemids.addChildTag("ItemId", "nsTypes", null);
+                itemId.setAttribute("Id", item.Id);
+                if (item.ChangeKey) {
+                    itemId.setAttribute("ChangeKey", item.ChangeKey);
+                }
+                itemId = null;
             }
-            itemId = null;
         }
         itemids = null;
 

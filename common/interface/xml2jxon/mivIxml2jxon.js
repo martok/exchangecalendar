@@ -326,8 +326,10 @@ mivIxml2jxon.prototype = {
             index = "_default_";
         }
         this.nameSpaces[index] = nameSpaceMgr.addNameSpace(index, b);
-        for each(var child in this.tags) {
-            child.addNameSpace(index, b);
+        if (this.tags) {
+            for (var child of Object.values(this.tags)) {
+                child.addNameSpace(index, b);
+            }
         }
     },
     setAttribute: function _setAttribute(a, b) {
@@ -528,7 +530,7 @@ mivIxml2jxon.prototype = {
         for (let index in this.tags) {
             cc++;
             if (isArray(this.tags[index])) {
-                for each(let tag in this.tags[index]) {
+                for (let tag of this.tags[index]) {
                     r += tag.toString(nss);
                 }
             }
@@ -562,8 +564,10 @@ mivIxml2jxon.prototype = {
         else {
             r = "<" + ns + this.tagName + at + nss + ">" + r + "</" + ns + this.tagName + ">";
         }
-        for each(let s in this._siblings) {
-            r = r + s.toString();
+        if (this._siblings) {
+            for (let s of Object.values(this._siblings)) {
+                r = r + s.toString();
+            }
         }
         return r;
     },

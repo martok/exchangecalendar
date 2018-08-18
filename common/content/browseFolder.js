@@ -146,18 +146,22 @@ exchWebService_browseTreeView.prototype = {
     openFolder: function (idx) {
         var insertedRows = 0;
         var index = idx + 1;
-        for each(var child in this.folders[idx].children) {
-            this.folders.splice(index, 0, child); // Add one
+        var children = this.folders[idx].children;
+        if (children) {
+            for (var child of Object.values(children)) {
+                this.folders.splice(index, 0, child); // Add one
 
-            if ((child.isContainer) && (child.isContainerOpen)) {
-                // We have to add the children of this child. and so on.
-                var childRowCount = this.openFolder(index);
-                insertedRows = insertedRows + childRowCount;
-                index = index + childRowCount;
+                if ((child.isContainer) && (child.isContainerOpen)) {
+                    // We have to add the children of this child. and so on.
+                    var childRowCount = this.openFolder(index);
+                    insertedRows = insertedRows + childRowCount;
+                    index = index + childRowCount;
+                }
+                insertedRows++;
+                index++;
             }
-            insertedRows++;
-            index++;
         }
+        children = null;
         this.folders[idx].isContainerOpen = true;
         return insertedRows;
     },
@@ -290,8 +294,10 @@ exchWebService_browseTreeView.prototype = {
         var parentIndex = this.getItemIndex(erBrowseFolderRequest.argument);
         if (parentIndex > -1) {
             var parent = this.folders[parentIndex];
-            for each(var folder in childFolders) {
-                this.addChild(parent, folder);
+            if (childFolders) {
+                for (var folder of Object.values(childFolders)) {
+                    this.addChild(parent, folder);
+                }
             }
         }
         window.setCursor("auto");

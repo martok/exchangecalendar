@@ -402,18 +402,20 @@ erGetItemsRequest.prototype = {
         */
 
         var itemids = xml2json.addTag(req, "ItemIds", "nsMessages", null);
-        for each(var item in this.ids) {
-            var itemId = xml2json.addTag(itemids, "ItemId", "nsTypes", null);
-            xml2json.setAttribute(itemId, "Id", item.Id);
-            this.requestedItemId.push(item.Id);
-            if (item.ChangeKey) {
-                xml2json.setAttribute(itemId, "ChangeKey", item.ChangeKey);
+        if (this.ids) {
+            for (var item of Object.values(this.ids)) {
+                var itemId = xml2json.addTag(itemids, "ItemId", "nsTypes", null);
+                xml2json.setAttribute(itemId, "Id", item.Id);
+                this.requestedItemId.push(item.Id);
+                if (item.ChangeKey) {
+                    xml2json.setAttribute(itemId, "ChangeKey", item.ChangeKey);
+                }
+                if (item.index) {
+                    //exchWebService.commonFunctions.LOG("erGetTaskItemsRequest.execute. We have an index.");
+                    this.argument.occurrenceIndexes[item.Id] = item.index;
+                }
+                itemId = null;
             }
-            if (item.index) {
-                //exchWebService.commonFunctions.LOG("erGetTaskItemsRequest.execute. We have an index.");
-                this.argument.occurrenceIndexes[item.Id] = item.index;
-            }
-            itemId = null;
         }
         itemids = null;
 

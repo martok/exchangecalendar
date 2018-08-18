@@ -70,13 +70,15 @@ mivExchangeAccountManager.prototype = {
     getAccounts: function _getAccounts() {
         var result = {};
         var ids = this.getAccountIds()
-        for each(var id in ids) {
+        if (ids) {
+            for (var id of Object.values(ids)) {
 
-            if (id != "") {
-                this.logInfo("id:" + id);
-                var tmpResult = this.getAccountById(id);
-                if (tmpResult.result) {
-                    result[id] = tmpResult.account;
+                if (id != "") {
+                    this.logInfo("id:" + id);
+                    var tmpResult = this.getAccountById(id);
+                    if (tmpResult.result) {
+                        result[id] = tmpResult.account;
+                    }
                 }
             }
         }
@@ -93,27 +95,29 @@ mivExchangeAccountManager.prototype = {
         if (children.length > 0) {
             result = true;
             account["id"] = aId;
-            for (var index in children) {
-                var attribute = children[index].substr(children[index].indexOf(".") + 1);
-                switch (this.prefs.getPrefType(children[index])) {
-                case this.prefs.PREF_STRING:
-                    account[attribute] = {
-                        type: "string",
-                        value: this.prefs.getCharPref(children[index])
-                    };
-                    break;
-                case this.prefs.PREF_INT:
-                    account[attribute] = {
-                        type: "int",
-                        value: this.prefs.getIntPref(children[index])
-                    };
-                    break;
-                case this.prefs.PREF_BOOL:
-                    account[attribute] = {
-                        type: "bool",
-                        value: this.prefs.getBoolPref(children[index])
-                    };
-                    break;
+            if (children) {
+                for (var index of Object.values(children)) {
+                    var attribute = children[index].substr(children[index].indexOf(".") + 1);
+                    switch (this.prefs.getPrefType(children[index])) {
+                    case this.prefs.PREF_STRING:
+                        account[attribute] = {
+                            type: "string",
+                            value: this.prefs.getCharPref(children[index])
+                        };
+                        break;
+                    case this.prefs.PREF_INT:
+                        account[attribute] = {
+                            type: "int",
+                            value: this.prefs.getIntPref(children[index])
+                        };
+                        break;
+                    case this.prefs.PREF_BOOL:
+                        account[attribute] = {
+                            type: "bool",
+                            value: this.prefs.getBoolPref(children[index])
+                        };
+                        break;
+                    }
                 }
             }
         }
@@ -126,9 +130,11 @@ mivExchangeAccountManager.prototype = {
 
     getAccountByServer: function _getAccountByServer(aServer) {
         var accounts = this.getAccounts();
-        for each(var account in accounts) {
-            if ((account.server) && (account.server.value) && (account.server.value.toLowerCase() == aServer.toLowerCase())) {
-                return account;
+        if (accounts) {
+            for (var account of Object.values(accounts)) {
+                if ((account.server) && (account.server.value) && (account.server.value.toLowerCase() == aServer.toLowerCase())) {
+                    return account;
+                }
             }
         }
         return null;

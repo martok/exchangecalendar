@@ -179,11 +179,15 @@ erGetMeetingRequestByUIDRequest.prototype = {
         var includesLastItemInRange = xml2json.getAttribute(rootFolder[0], "IncludesLastItemInRange", "true");
 
         var aMeetingRequests = [];
-        for each(var tmpItem in xml2json.XPath(rootFolder[0], "/t:Items/*")) {
-            if (xml2json.getTagValue(tmpItem, "t:UID") == this.argument.uid) {
-                aMeetingRequests.push(tmpItem);
+        var tmpItem_result = xml2json.XPath(rootFolder[0], "/t:Items/*");
+        if (tmpItem_result) {
+            for (var tmpItem of Object.values(tmpItem_result)) {
+                if (xml2json.getTagValue(tmpItem, "t:UID") == this.argument.uid) {
+                    aMeetingRequests.push(tmpItem);
+                }
             }
         }
+        tmpItem_result = null;
         rootFolder = null;
 
         if (this.mCbOk) {

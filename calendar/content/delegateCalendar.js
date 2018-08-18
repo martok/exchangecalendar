@@ -372,10 +372,12 @@ exchDelegateCalendarSettings.prototype = {
                             .getService(Ci.calICalendarManager);
 
                         let calendars = calManager.getCalendars({});
-                        for each(let calendar in calendars) {
-                            if (tmpUUID == calendar.id) {
-                                calManager.unregisterCalendar(calendar);
-                                calManager.deleteCalendar(calendar);
+                        if (calendars) {
+                            for (let calendar of Object.values(calendars)) {
+                                if (tmpUUID == calendar.id) {
+                                    calManager.unregisterCalendar(calendar);
+                                    calManager.deleteCalendar(calendar);
+                                }
                             }
                         }
                     }

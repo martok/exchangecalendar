@@ -305,10 +305,12 @@ mivExchangeLoadBalancer.prototype = {
         }
 
         var queueToUse = undefined;
-        for each(var serverq in this.serverQueues) {
-            if (serverq.matchesServer(aJob.arguments.serverUrl)) {
-                queueToUse = serverq;
-                break;
+        if (this.serverQueues) {
+            for (var serverq of Object.values(this.serverQueues)) {
+                if (serverq.matchesServer(aJob.arguments.serverUrl)) {
+                    queueToUse = serverq;
+                    break;
+                }
             }
         }
 
@@ -326,23 +328,26 @@ mivExchangeLoadBalancer.prototype = {
 
     clearQueueForCalendar: function _clearQueueForCalendar(aServer, aCalendar) {
         var queueToUse = undefined;
-        for each(var serverq in this.serverQueues) {
-            if (serverq.matchesServer(aServer)) {
-                serverq.clearQueueForCalendar(aCalendar);
-                break;
+        if (this.serverQueues) {
+            for (var serverq of Object.values(this.serverQueues)) {
+                if (serverq.matchesServer(aServer)) {
+                    serverq.clearQueueForCalendar(aCalendar);
+                    break;
+                }
             }
         }
     },
 
     stopRunningJobsForCalendar: function _stopRunningJobsForCalendar(aServer, aCalendar) {
         var queueToUse = undefined;
-        for each(var serverq in this.serverQueues) {
-            if (serverq.matchesServer(aServer)) {
-                serverq.stopRunningJobsForCalendar(aCalendar);
-                break;
+        if (this.serverQueues) {
+            for (var serverq of Object.values(this.serverQueues)) {
+                if (serverq.matchesServer(aServer)) {
+                    serverq.stopRunningJobsForCalendar(aCalendar);
+                    break;
+                }
             }
         }
-
     },
 
     logInfo: function _logInfo(message, aDebugLevel) {

@@ -416,7 +416,7 @@ exchangeAbDistListDirectory.prototype = {
         var result = [];
 
         if (this.distLists.length > 0) {
-            for each(var distList in this.distLists) {
+            for (var distList of this.distLists) {
                 result.push(distList);
             }
         }
@@ -475,18 +475,22 @@ exchangeAbDistListDirectory.prototype = {
                     // Remove cards.
                     var oldList = this.contacts;
                     this.contacts = {};
-                    for each(var contact in oldList) {
-                        exchWebService.commonAbFunctions.logInfo("exchangeAbDistListDirectory: '" + this.dirName + "' removed contact:" + contact.getProperty("DisplayName", ""));
-                        MailServices.ab.notifyDirectoryItemDeleted(this, contact);
-                        MailServices.ab.notifyDirectoryDeleted(this, contact);
+                    if (oldList) {
+                        for (var contact of Object.values(oldList)) {
+                            exchWebService.commonAbFunctions.logInfo("exchangeAbDistListDirectory: '" + this.dirName + "' removed contact:" + contact.getProperty("DisplayName", ""));
+                            MailServices.ab.notifyDirectoryItemDeleted(this, contact);
+                            MailServices.ab.notifyDirectoryDeleted(this, contact);
+                        }
                     }
 
                     // Remove distLists.
                     var oldList = this.distLists;
                     this.distLists = new Array();
-                    for each(var distList in oldList) {
-                        exchWebService.commonAbFunctions.logInfo("exchangeAbDistListDirectory: '" + this.dirName + "' removed distList:" + distList.dirName);
-                        MailServices.ab.notifyDirectoryDeleted(this, distList);
+                    if (oldList) {
+                        for (var distList of Object.values(oldList)) {
+                            exchWebService.commonAbFunctions.logInfo("exchangeAbDistListDirectory: '" + this.dirName + "' removed distList:" + distList.dirName);
+                            MailServices.ab.notifyDirectoryDeleted(this, distList);
+                        }
                     }
                 }
                 else {
@@ -557,9 +561,11 @@ exchangeAbDistListDirectory.prototype = {
 
                     this.observerService.notifyObservers(this, "onExchangeGALSearchStart", this._searchQuery);
 
-                    for each(var contact in this.contacts) {
-                        exchWebService.commonAbFunctions.logInfo("exchangeAbDistListDirectory: Adding sub child A '" + contact.displayName + "' to contacts. dirName:" + this.dirName);
-                        MailServices.ab.notifyDirectoryItemAdded(this, contact);
+                    if (this.contacts) {
+                        for (var contact of Object.values(this.contacts)) {
+                            exchWebService.commonAbFunctions.logInfo("exchangeAbDistListDirectory: Adding sub child A '" + contact.displayName + "' to contacts. dirName:" + this.dirName);
+                            MailServices.ab.notifyDirectoryItemAdded(this, contact);
+                        }
                     }
 
                     this.observerService.notifyObservers(this, "onExchangeGALSearchEnd", this._searchQuery);
@@ -1144,8 +1150,10 @@ exchangeAbDistListDirectory.prototype = {
 
         // This will eat performance when the list is long.
         this._addressLists.clear();
-        for each(var contact in this.contacts) {
-            this._addressLists.appendElement(contact, false);
+        if (this.contacts) {
+            for (var contact of Object.values(this.contacts)) {
+                this._addressLists.appendElement(contact, false);
+            }
         }
 
         exchWebService.commonAbFunctions.logInfo(this.uuid + ": newCard.localId:" + newCard.localId);
@@ -1179,77 +1187,79 @@ exchangeAbDistListDirectory.prototype = {
             var aStoreContacts = new Array();
             var aADContacts = new Array();
             this.distLists = new Array()
-            for each(var mailbox in aMailboxes) {
-                var calMailbox = this.convertExchangeMailbox(mailbox);
+            if (aMailboxes) {
+                for (var mailbox of Object.values(aMailboxes)) {
+                    var calMailbox = this.convertExchangeMailbox(mailbox);
 
-                switch (calMailbox.mailboxType) {
-                case "Contact": // A normal in store or AD contact
-                    exchWebService.commonAbFunctions.logInfo("distListLoadOk: new Contact:" + calMailbox.name);
-                    if ((calMailbox.itemId) && (calMailbox.itemId.id)) {
-                        // It is a private store contact.
-                        aStoreContacts.push({
-                            Id: calMailbox.itemId.id
-                        });
-                    }
-                    break;
-                case "PrivateDL": // Private Store distribution list.
-                    if ((calMailbox.itemId) && (calMailbox.itemId.id)) {
-                        // It is a private store distList.
-                        exchWebService.commonAbFunctions.logInfo("distListLoadOk: new Private distList:" + calMailbox.name + " in dir:" + this.dirName);
+                    switch (calMailbox.mailboxType) {
+                    case "Contact": // A normal in store or AD contact
+                        exchWebService.commonAbFunctions.logInfo("distListLoadOk: new Contact:" + calMailbox.name);
+                        if ((calMailbox.itemId) && (calMailbox.itemId.id)) {
+                            // It is a private store contact.
+                            aStoreContacts.push({
+                                Id: calMailbox.itemId.id
+                            });
+                        }
+                        break;
+                    case "PrivateDL": // Private Store distribution list.
+                        if ((calMailbox.itemId) && (calMailbox.itemId.id)) {
+                            // It is a private store distList.
+                            exchWebService.commonAbFunctions.logInfo("distListLoadOk: new Private distList:" + calMailbox.name + " in dir:" + this.dirName);
 
-                        var dirName = this.childNodeURI + "id=" + encodeURIComponent(calMailbox.itemId.id) + "&name=" + encodeURIComponent(calMailbox.name) + "&parentId=" + this.parentId + "&type=PrivateDL";
+                            var dirName = this.childNodeURI + "id=" + encodeURIComponent(calMailbox.itemId.id) + "&name=" + encodeURIComponent(calMailbox.name) + "&parentId=" + this.parentId + "&type=PrivateDL";
 
-                        try {
-                            var newCard = Cc["@1st-setup.nl/exchange/abcard;1"]
-                                .createInstance(Ci.mivExchangeAbCard);
-                            newCard.convertExchangeDistListToCard(this, mailbox, dirName);
-                            this.updateList(newCard);
-                            var dir = MailServices.ab.getDirectory(dirName);
-                            if (dir) {
-                                this.distLists.push(dir);
-                                MailServices.ab.notifyDirectoryItemAdded(this, dir);
+                            try {
+                                var newCard = Cc["@1st-setup.nl/exchange/abcard;1"]
+                                    .createInstance(Ci.mivExchangeAbCard);
+                                newCard.convertExchangeDistListToCard(this, mailbox, dirName);
+                                this.updateList(newCard);
+                                var dir = MailServices.ab.getDirectory(dirName);
+                                if (dir) {
+                                    this.distLists.push(dir);
+                                    MailServices.ab.notifyDirectoryItemAdded(this, dir);
+                                }
+                            }
+                            catch (err) {
+                                exchWebService.commonAbFunctions.logInfo("exchangeAbFolderDirectory: Error adding dislist '" + dirName + "' Error:" + err);
                             }
                         }
-                        catch (err) {
-                            exchWebService.commonAbFunctions.logInfo("exchangeAbFolderDirectory: Error adding dislist '" + dirName + "' Error:" + err);
+                        break;
+                    case "PublicDL": // An Active Directory distribution list.
+                        exchWebService.commonAbFunctions.logInfo("exchangeAbFolderDirectory: distListExpandOk: new Public distList:" + calMailbox.name + " in GAL of " + this.serverUrl);
+
+                        var dirName = this.childNodeURI + "id=" + encodeURIComponent(calMailbox.routingType + ":" + calMailbox.emailAddress) + "&name=" + encodeURIComponent(calMailbox.name) + "&parentId=" + this.parentId + "&type=PublicDL";
+
+                        // Make a card from the contact details.
+                        var newCard = Cc["@1st-setup.nl/exchange/abcard;1"]
+                            .createInstance(Ci.mivExchangeAbCard);
+                        newCard.convertExchangeDistListToCard(this, mailbox, dirName);
+                        this.updateList(newCard);
+                        var dir = MailServices.ab.getDirectory(dirName);
+                        if (dir) {
+                            this.distLists.push(dir);
+                            MailServices.ab.notifyDirectoryItemAdded(this, dir);
                         }
+
+                        break;
+                    case "OneOff":
+                        exchWebService.commonAbFunctions.logInfo("exchangeAbFolderDirectory: distListExpandOk: new OneOff Contact:" + calMailbox.name + " in GAL of " + this.serverUrl);
+
+                        // Make a card from the contact details.
+                        var newCard = Cc["@1st-setup.nl/exchange/abcard;1"]
+                            .createInstance(Ci.mivExchangeAbCard);
+                        newCard.convertExchangeContactToCard(this, mailbox, calMailbox.mailboxType);
+                        newCard.setProperty("exchangeUser", this.user);
+                        newCard.setProperty("exchangeServerUrl", this.serverUrl);
+                        this.updateList(newCard);
+
+                        break;
+                    case "Mailbox": // An Active Directory mailbox
+                        exchWebService.commonAbFunctions.logInfo("distListExpandOk: new Mailbox:" + calMailbox.name);
+                        aADContacts.push(calMailbox);
+                        break;
+                    default:
+                        exchWebService.commonAbFunctions.logInfo("distListExpandOk: Unknown mailboxtype:" + calMailbox.mailboxType);
                     }
-                    break;
-                case "PublicDL": // An Active Directory distribution list.
-                    exchWebService.commonAbFunctions.logInfo("exchangeAbFolderDirectory: distListExpandOk: new Public distList:" + calMailbox.name + " in GAL of " + this.serverUrl);
-
-                    var dirName = this.childNodeURI + "id=" + encodeURIComponent(calMailbox.routingType + ":" + calMailbox.emailAddress) + "&name=" + encodeURIComponent(calMailbox.name) + "&parentId=" + this.parentId + "&type=PublicDL";
-
-                    // Make a card from the contact details.
-                    var newCard = Cc["@1st-setup.nl/exchange/abcard;1"]
-                        .createInstance(Ci.mivExchangeAbCard);
-                    newCard.convertExchangeDistListToCard(this, mailbox, dirName);
-                    this.updateList(newCard);
-                    var dir = MailServices.ab.getDirectory(dirName);
-                    if (dir) {
-                        this.distLists.push(dir);
-                        MailServices.ab.notifyDirectoryItemAdded(this, dir);
-                    }
-
-                    break;
-                case "OneOff":
-                    exchWebService.commonAbFunctions.logInfo("exchangeAbFolderDirectory: distListExpandOk: new OneOff Contact:" + calMailbox.name + " in GAL of " + this.serverUrl);
-
-                    // Make a card from the contact details.
-                    var newCard = Cc["@1st-setup.nl/exchange/abcard;1"]
-                        .createInstance(Ci.mivExchangeAbCard);
-                    newCard.convertExchangeContactToCard(this, mailbox, calMailbox.mailboxType);
-                    newCard.setProperty("exchangeUser", this.user);
-                    newCard.setProperty("exchangeServerUrl", this.serverUrl);
-                    this.updateList(newCard);
-
-                    break;
-                case "Mailbox": // An Active Directory mailbox
-                    exchWebService.commonAbFunctions.logInfo("distListExpandOk: new Mailbox:" + calMailbox.name);
-                    aADContacts.push(calMailbox);
-                    break;
-                default:
-                    exchWebService.commonAbFunctions.logInfo("distListExpandOk: Unknown mailboxtype:" + calMailbox.mailboxType);
                 }
             }
 
@@ -1311,11 +1321,13 @@ exchangeAbDistListDirectory.prototype = {
     contactsLoadOk: function _contactsLoadOk(erGetContactsRequest, aContacts) {
         exchWebService.commonAbFunctions.logInfo("exchangeAbDistListDirectory: contactsLoadOk: contacts:" + aContacts.length);
 
-        for each(var contact in aContacts) {
-            //exchWebService.commonAbFunctions.logInfo("Contact card:"+contact.toString(),2);
-            exchWebService.commonAbFunctions.logInfo("exchangeAbDistListDirectory: new childCards:" + contact.getTagValue("t:DisplayName"));
-            this.ecUpdateCard(contact);
+        if (aContacts) {
+            for (var contact of Object.values(aContacts)) {
+                //exchWebService.commonAbFunctions.logInfo("Contact card:"+contact.toString(),2);
+                exchWebService.commonAbFunctions.logInfo("exchangeAbDistListDirectory: new childCards:" + contact.getTagValue("t:DisplayName"));
+                this.ecUpdateCard(contact);
 
+            }
         }
 
         this.isLoading = false;
@@ -1326,70 +1338,72 @@ exchangeAbDistListDirectory.prototype = {
 
         exchWebService.commonAbFunctions.logInfo("exchangeAbDistListDirectory: resolveNamesOk: contacts:" + aResolutions.length);
 
-        for each(var resolution in aResolutions) {
-            exchWebService.commonAbFunctions.logInfo("resolution card:" + resolution.toString());
+        if (aResolutions) {
+            for (var resolution of Object.values(aResolutions)) {
+                exchWebService.commonAbFunctions.logInfo("resolution card:" + resolution.toString());
 
-            var mailbox = resolution.getTags("t:Mailbox");
-            exchWebService.commonAbFunctions.logInfo("resolution mailbox card:" + mailbox[0].toString());
-            var contact = resolution.getTags("t:Contact");
-            if (contact.length > 0) {
-                exchWebService.commonAbFunctions.logInfo("resolution contact card:" + contact[0].toString());
-            }
-            var calMailbox;
-            if (mailbox.length > 0) {
-                calMailbox = this.convertExchangeMailbox(mailbox[0]);
+                var mailbox = resolution.getTags("t:Mailbox");
+                exchWebService.commonAbFunctions.logInfo("resolution mailbox card:" + mailbox[0].toString());
+                var contact = resolution.getTags("t:Contact");
+                if (contact.length > 0) {
+                    exchWebService.commonAbFunctions.logInfo("resolution contact card:" + contact[0].toString());
+                }
+                var calMailbox;
+                if (mailbox.length > 0) {
+                    calMailbox = this.convertExchangeMailbox(mailbox[0]);
 
-                switch (calMailbox.mailboxType) {
-                case "PrivateDL": // An Contact folder distribution list.
-                    try {
-                        var dirName = this.childNodeURI + "id=" + encodeURIComponent(calMailbox.itemId.id) + "&name=" + encodeURIComponent(calMailbox.name) + "&parentId=" + this.parentId + "&type=PrivateDL";
+                    switch (calMailbox.mailboxType) {
+                    case "PrivateDL": // An Contact folder distribution list.
+                        try {
+                            var dirName = this.childNodeURI + "id=" + encodeURIComponent(calMailbox.itemId.id) + "&name=" + encodeURIComponent(calMailbox.name) + "&parentId=" + this.parentId + "&type=PrivateDL";
 
+                            var newCard = Cc["@1st-setup.nl/exchange/abcard;1"]
+                                .createInstance(Ci.mivExchangeAbCard);
+                            newCard.convertExchangeDistListToCard(this, mailbox[0], dirName);
+                            this.updateList(newCard);
+                            var dir = MailServices.ab.getDirectory(dirName);
+                            if (dir) {
+                                this.distLists.push(dir);
+                                MailServices.ab.notifyDirectoryItemAdded(this, dir);
+                            }
+                        }
+                        catch (err) {
+                            exchWebService.commonAbFunctions.logInfo("exchangeAbFolderDirectory: resolveNamesOk: Foutje:" + err);
+                        }
+                        break;
+                    case "PublicDL": // An Active Directory distribution list.
+                        exchWebService.commonAbFunctions.logInfo("exchangeAbFolderDirectory: resolveNamesOk: new Public distList:" + calMailbox.name + " in GAL of " + this.serverUrl);
+
+                        var dirName = this.childNodeURI + "id=" + encodeURIComponent(calMailbox.routingType + ":" + calMailbox.emailAddress) + "&name=" + encodeURIComponent(calMailbox.name) + "&parentId=" + this.parentId + "&type=PublicDL";
+
+                        // Make a card from the contact details.
                         var newCard = Cc["@1st-setup.nl/exchange/abcard;1"]
                             .createInstance(Ci.mivExchangeAbCard);
-                        newCard.convertExchangeDistListToCard(this, mailbox[0], dirName);
+                        newCard.convertExchangeDistListToCard(this, contact[0], dirName);
                         this.updateList(newCard);
                         var dir = MailServices.ab.getDirectory(dirName);
                         if (dir) {
                             this.distLists.push(dir);
                             MailServices.ab.notifyDirectoryItemAdded(this, dir);
                         }
+
+                        break;
+                    case "Contact":
+                    case "Mailbox": // An Active Directory Contact Mailbox.
+                        exchWebService.commonAbFunctions.logInfo("exchangeAbFolderDirectory: resolveNamesOk: new Mailbox Contact:" + calMailbox.name + " in GAL of " + this.serverUrl);
+
+                        // Make a card from the contact details.
+                        var newCard = Cc["@1st-setup.nl/exchange/abcard;1"]
+                            .createInstance(Ci.mivExchangeAbCard);
+                        newCard.convertExchangeContactToCard(this, contact[0], calMailbox.mailboxType);
+                        newCard.setProperty("exchangeUser", this.user);
+                        newCard.setProperty("exchangeServerUrl", this.serverUrl);
+                        this.updateList(newCard);
+
+                        break;
+                    default:
+                        exchWebService.commonAbFunctions.logInfo("exchangeAbFolderDirectory: resolveNamesOk: Unknown mailboxtype:" + calMailbox.mailboxType);
                     }
-                    catch (err) {
-                        exchWebService.commonAbFunctions.logInfo("exchangeAbFolderDirectory: resolveNamesOk: Foutje:" + err);
-                    }
-                    break;
-                case "PublicDL": // An Active Directory distribution list.
-                    exchWebService.commonAbFunctions.logInfo("exchangeAbFolderDirectory: resolveNamesOk: new Public distList:" + calMailbox.name + " in GAL of " + this.serverUrl);
-
-                    var dirName = this.childNodeURI + "id=" + encodeURIComponent(calMailbox.routingType + ":" + calMailbox.emailAddress) + "&name=" + encodeURIComponent(calMailbox.name) + "&parentId=" + this.parentId + "&type=PublicDL";
-
-                    // Make a card from the contact details.
-                    var newCard = Cc["@1st-setup.nl/exchange/abcard;1"]
-                        .createInstance(Ci.mivExchangeAbCard);
-                    newCard.convertExchangeDistListToCard(this, contact[0], dirName);
-                    this.updateList(newCard);
-                    var dir = MailServices.ab.getDirectory(dirName);
-                    if (dir) {
-                        this.distLists.push(dir);
-                        MailServices.ab.notifyDirectoryItemAdded(this, dir);
-                    }
-
-                    break;
-                case "Contact":
-                case "Mailbox": // An Active Directory Contact Mailbox.
-                    exchWebService.commonAbFunctions.logInfo("exchangeAbFolderDirectory: resolveNamesOk: new Mailbox Contact:" + calMailbox.name + " in GAL of " + this.serverUrl);
-
-                    // Make a card from the contact details.
-                    var newCard = Cc["@1st-setup.nl/exchange/abcard;1"]
-                        .createInstance(Ci.mivExchangeAbCard);
-                    newCard.convertExchangeContactToCard(this, contact[0], calMailbox.mailboxType);
-                    newCard.setProperty("exchangeUser", this.user);
-                    newCard.setProperty("exchangeServerUrl", this.serverUrl);
-                    this.updateList(newCard);
-
-                    break;
-                default:
-                    exchWebService.commonAbFunctions.logInfo("exchangeAbFolderDirectory: resolveNamesOk: Unknown mailboxtype:" + calMailbox.mailboxType);
                 }
             }
         }

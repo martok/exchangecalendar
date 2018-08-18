@@ -285,13 +285,15 @@ mivExchangeEvent.prototype = {
                     .createInstance(Ci.mivIxml2jxon);
                 var categories = this.getCategories({});
                 var first = true;
-                for each(var category in categories) {
-                    if (first) {
-                        first = false;
-                        categoriesXML.processXMLString("<t:String>" + category + "</t:String>", 0, null);
-                    }
-                    else {
-                        categoriesXML.addSibblingTag("String", "t", category);
+                if (categories) {
+                    for (var category of Object.values(categories)) {
+                        if (first) {
+                            first = false;
+                            categoriesXML.processXMLString("<t:String>" + category + "</t:String>", 0, null);
+                        }
+                        else {
+                            categoriesXML.addSibblingTag("String", "t", category);
+                        }
                     }
                 }
                 if (categories.length > 0) {
@@ -502,41 +504,43 @@ mivExchangeEvent.prototype = {
                         null: "Unknown"
                     };
 
-                    for each(var attendee in attendees) {
-                        switch (attendee.role) {
-                        case "REQ-PARTICIPANT":
-                            if (reqAttendeeCount == 0) {
-                                var reqAttendees = exchGlobalFunctions.xmlToJxon('<t:Attendee xmlns:m="' + nsMessagesStr + '" xmlns:t="' + nsTypesStr + '"/>');
-                                var ae = reqAttendees;
+                    if (attendees) {
+                        for (var attendee of Object.values(attendees)) {
+                            switch (attendee.role) {
+                            case "REQ-PARTICIPANT":
+                                if (reqAttendeeCount == 0) {
+                                    var reqAttendees = exchGlobalFunctions.xmlToJxon('<t:Attendee xmlns:m="' + nsMessagesStr + '" xmlns:t="' + nsTypesStr + '"/>');
+                                    var ae = reqAttendees;
+                                }
+                                else {
+                                    var ae = reqAttendees.addSibblingTag("Attendee", "t", null);
+                                }
+                                reqAttendeeCount++;
+                                break;
+                            case "OPT-PARTICIPANT":
+                                if (optAttendeeCount == 0) {
+                                    var optAttendees = exchGlobalFunctions.xmlToJxon('<t:Attendee xmlns:m="' + nsMessagesStr + '" xmlns:t="' + nsTypesStr + '"/>');
+                                    var ae = optAttendees;
+                                }
+                                else {
+                                    var ae = optAttendees.addSibblingTag("Attendee", "t", null);
+                                }
+                                optAttendeeCount++;
+                                break;
+                            }
+                            var mailbox = ae.addChildTag("Mailbox", "t", null);
+                            mailbox.addChildTag("Name", "t", attendee.commonName);
+
+                            var tmpEmailAddress = attendee.id.replace(/^mailto:/i, '');
+                            if (tmpEmailAddress.indexOf("@") > 0) {
+                                mailbox.addChildTag("EmailAddress", "t", tmpEmailAddress);
                             }
                             else {
-                                var ae = reqAttendees.addSibblingTag("Attendee", "t", null);
+                                mailbox.addChildTag("EmailAddress", "t", "unknown@somewhere.com");
                             }
-                            reqAttendeeCount++;
-                            break;
-                        case "OPT-PARTICIPANT":
-                            if (optAttendeeCount == 0) {
-                                var optAttendees = exchGlobalFunctions.xmlToJxon('<t:Attendee xmlns:m="' + nsMessagesStr + '" xmlns:t="' + nsTypesStr + '"/>');
-                                var ae = optAttendees;
-                            }
-                            else {
-                                var ae = optAttendees.addSibblingTag("Attendee", "t", null);
-                            }
-                            optAttendeeCount++;
-                            break;
-                        }
-                        var mailbox = ae.addChildTag("Mailbox", "t", null);
-                        mailbox.addChildTag("Name", "t", attendee.commonName);
+                            ae.addChildTag("ResponseType", "t", attendeeStatus[attendee.participationStatus]);
 
-                        var tmpEmailAddress = attendee.id.replace(/^mailto:/i, '');
-                        if (tmpEmailAddress.indexOf("@") > 0) {
-                            mailbox.addChildTag("EmailAddress", "t", tmpEmailAddress);
                         }
-                        else {
-                            mailbox.addChildTag("EmailAddress", "t", "unknown@somewhere.com");
-                        }
-                        ae.addChildTag("ResponseType", "t", attendeeStatus[attendee.participationStatus]);
-
                     }
                     if (reqAttendeeCount > 0) {
                         this._nonPersonalDataChanged = true;

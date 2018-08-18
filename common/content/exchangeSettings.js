@@ -194,19 +194,26 @@ exchExchangeSettings.prototype = {
     },
 
     permissionObject: function _permissionObject(aPermission) {
-        for each(var item in aPermission.XPath('/*')) {
-            if (item.tagName == "UserId") {
-                for each(var userProp in item.XPath('/*')) {
-                    if (!this[item.tagName]) {
-                        this[item.tagName] = {};
+        var permissions = aPermission.XPath('/*');
+        if (permissions) {
+            for (var item of Object.values(permissions)) {
+                if (item.tagName == "UserId") {
+                    var properties = item.XPath('/*');
+                    if (properties) {
+                        for (var userProp of Object.values(properties)) {
+                            if (!this[item.tagName]) {
+                                this[item.tagName] = {};
+                            }
+                            this[item.tagName][userProp.tagName] = userProp.value;
+                        }
                     }
-                    this[item.tagName][userProp.tagName] = userProp.value;
+                }
+                else {
+                    this[item.tagName] = item.value;
                 }
             }
-            else {
-                this[item.tagName] = item.value;
-            }
         }
+        permissions = null;
     },
 
     showFolderProprties: function _showFolderProprties(aProperties) {
@@ -240,8 +247,10 @@ exchExchangeSettings.prototype = {
 
         // PermissionSet
         var permissions = new Array;
-        for each(var permission in calendarPermissions) {
-            permissions.push(new this.permissionObject(permission));
+        if (calendarPermissions) {
+            for (var permission of Object.values(calendarPermissions)) {
+                permissions.push(new this.permissionObject(permission));
+            }
         }
 
         try {

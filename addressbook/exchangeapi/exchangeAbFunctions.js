@@ -101,10 +101,12 @@ exchWebService.commonAbFunctions = {
         this.logInfo("deleteAccount:" + aUUID);
         var currentAccounts = this.getAccounts();
         var newAccounts = [];
-        for each(var account in currentAccounts) {
-            this.logInfo("  Account:" + account);
-            if (account != aUUID) {
-                newAccounts.push(account);
+        if (currentAccounts) {
+            for (var account of Object.values(currentAccounts)) {
+                this.logInfo("  Account:" + account);
+                if (account != aUUID) {
+                    newAccounts.push(account);
+                }
             }
         }
         this.logInfo("  accounts:" + newAccounts.join(","));

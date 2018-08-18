@@ -106,13 +106,15 @@ erDeleteAttachmentRequest.prototype = {
         var errorCount = 0;
         var okCount = 0;
 
-        for each(var deleteAttachmentResponseMessage in deleteAttachmentResponseMessages) {
-            if (deleteAttachmentResponseMessage.getAttribute("ResponseClass") != "Success") {
-                weHaveAnError = true;
-                errorCount++;
-            }
-            else {
-                okCount++;
+        if (deleteAttachmentResponseMessages) {
+            for (var deleteAttachmentResponseMessage of Object.values(deleteAttachmentResponseMessages)) {
+                if (deleteAttachmentResponseMessage.getAttribute("ResponseClass") != "Success") {
+                    weHaveAnError = true;
+                    errorCount++;
+                }
+                else {
+                    okCount++;
+                }
             }
         }
 
