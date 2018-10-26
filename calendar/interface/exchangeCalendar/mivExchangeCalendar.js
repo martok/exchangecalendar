@@ -7453,7 +7453,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
 
         var startDateStr = xml2json.getTagValue(aCalendarEvent, "t:StartTime", "");
         var endDateStr = xml2json.getTagValue(aCalendarEvent, "t:EndTime", "");
-        item.id = this.md5(startDateStr + endDateStr);
+        item.clearId(this.md5(startDateStr + endDateStr));
         if (this.itemCacheById[item.id]) {
             //dump("\n-- we already know this one --:"+xml2json.toString(aCalendarEvent)+"\n");
             //item = null;
