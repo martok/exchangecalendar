@@ -147,7 +147,7 @@ mivExchangeEvent.prototype = {
     },
 
     set startDate(aValue) {
-        if (aValue.toString() != this.startDate.toString()) {
+        if (aValue == null || this.startDate == null || aValue.toString() != this.startDate.toString()) {
             this._newStartDate = aValue;
             this._calEvent.startDate = aValue;
         }
@@ -168,7 +168,7 @@ mivExchangeEvent.prototype = {
 
     set endDate(aValue) {
         //dump("set enddate: title:"+this.title+", aValue:"+aValue);
-        if (aValue.toString() != this.endDate.toString()) {
+        if (aValue == null || this.startDate == null || aValue.toString() != this.endDate.toString()) {
             this._newEndDate = aValue;
             this._calEvent.endDate = aValue;
         }
