@@ -7415,9 +7415,6 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
             item.title = " (" + item.title + ")";
         }
 
-        //		item.setProperty("DESCRIPTION", aCalendarItem.getTagValue("t:Body"));
-
-        // item.startDate = null;
         if (xml2json.getTagValue(aCalendarEvent, "t:StartTime", null)) {
             if (this.isVersion2007) {
                 item.startDate = cal.fromRFC3339(xml2json.getTagValue(aCalendarEvent, "t:StartTime", null), this.globalFunctions.ecUTC());
@@ -7427,14 +7424,12 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
             }
         }
 
-        //		item.startDate = this.tryToSetDateValue(aCalendarEvent.getTagValue("t:StartTime"), null);
         if (!item.startDate) {
             if (this.debug) this.logInfo("We have an empty startdate. Skipping this item.");
             item = null;
             return null;
         }
 
-        // item.endDate = null;
         if (xml2json.getTagValue(aCalendarEvent, "t:EndTime", null)) {
             if (this.isVersion2007) {
                 item.endDate = cal.fromRFC3339(xml2json.getTagValue(aCalendarEvent, "t:EndTime", null), this.globalFunctions.ecUTC());
@@ -7444,7 +7439,6 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
             }
         }
 
-        //item.endDate = this.tryToSetDateValue(aCalendarEvent.getTagValue("t:EndTime"), null);
         if (!item.endDate) {
             if (this.debug) this.logInfo("We have an empty enddate. Skipping this item.");
             return null;
