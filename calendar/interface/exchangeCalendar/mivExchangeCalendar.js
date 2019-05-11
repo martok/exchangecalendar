@@ -8339,12 +8339,12 @@ calExchangeCalendar.prototype = {
 
         if (syncState) {
 
-            if ((this.syncState) && (syncState == this.syncState || syncState == this.syncStateInbox)) {
+            if ((this.syncState) && (syncState === this.syncState || syncState === this.syncStateInbox)) {
                 this.logError("Same syncState received.");
             }
 
             // This was the first time. we now save the syncState;
-            if (erSyncFolderItemsRequest.folderBase == "inbox") {
+            if (erSyncFolderItemsRequest.folderBase === "inbox") {
                 this.syncStateInbox = syncState;
                 this.prefs.deleteBranch("syncStateInbox");
                 this.prefs.setCharPref("syncStateInbox", syncState);
@@ -8359,65 +8359,43 @@ calExchangeCalendar.prototype = {
             this.weAreSyncing = false;
         }
 
-        var self = this;
-
-        var changes = [];
+        let changes = [];
         if (creations) {
-            for (var creation of Object.values(creations)) {
+            for (let creation of Object.values(creations)) {
                 changes.push(creation);
             }
         }
         if (updates) {
-            for (var update of Object.values(updates)) {
+            for (let update of Object.values(updates)) {
                 changes.push(update);
             }
         }
         if (changes.length > 0) {
-            switch (erSyncFolderItemsRequest.folderBase) {
-            case "tasks":
+            if (this.folderClass === "IPF.Task") {
                 this.findTaskItemsOK(erSyncFolderItemsRequest, changes);
-                break;
-            case "calendar":
+            } else if (this.folderClass === "IPF.Appointment") {
                 this.findCalendarItemsOK(erSyncFolderItemsRequest, changes, []);
-                break;
-            case "inbox":
+            } else if (this.folderClass === "IPF.Note" && erSyncFolderItemsRequest.folderBase === "inbox") {
                 this.findFollowupTaskItemsOK(erSyncFolderItemsRequest, changes);
-                break;
-            default:
+            } else {
                 this.logError("Changes could not be made." + erSyncFolderItemsRequest.folderBase);
             }
-
-            /*			this.addToQueue( erGetItemsRequest, 
-            				{user: this.user, 
-            				 mailbox: this.mailbox,
-            				 folderBase: this.folderBase,
-            				 serverUrl: this.serverUrl,
-            				 ids: changes,
-            				 folderID: this.folderID,
-            				 changeKey: this.changeKey,
-            				 folderClass: this.folderClass,
-            				 GUID: calExchangeCalendarGUID,
-            				 syncState: syncState }, 
-            				function(erGetItemsRequest, aIds, aItemErrors) { self.getTaskItemsOK(erGetItemsRequest, aIds, aItemErrors);}, 
-            				function(erGetItemsRequest, aCode, aMsg) { self.getTaskItemsError(erGetItemsRequest, aCode, aMsg);},
-            				null);
-            				*/
         }
 
         if (!syncState) return;
 
         if (deletions.length > 0) {
-            for (var deleted of deletions) {
-                var item = this.itemCacheById[deleted.Id];
+            for (let deleted of deletions) {
+                let item = this.itemCacheById[deleted.Id];
                 if ((!item) && (this.useOfflineCache)) {
                     // It could be that the item is not yet loaded from offlineCache. We do this now.
                     item = this.getItemFromOfflineCache(deleted.Id);
                 }
-                if ((item) && (item.calendarItemType != "RecurringMaster")) {
+                if ((item) && (item.calendarItemType !== "RecurringMaster")) {
                     // We have this one. Remove it.
                     if (this.debug) this.logInfo("Going to remove an item");
                     // Single item or occurrence.
-                    if (item.parentItem.id == item.id) {
+                    if (item.parentItem.id === item.id) {
                         if (this.debug) this.logInfo("This is a Single to delete. Title:" + item.title + ", calendarItemType:" + item.calendarItemType);
                     }
                     else {
@@ -8432,9 +8410,9 @@ calExchangeCalendar.prototype = {
                 }
                 else {
                     // Find matching master record.
-                    var master;
-                    for (var index in this.recurringMasterCache) {
-                        if ((this.recurringMasterCache[index]) && (this.recurringMasterCache[index].id == deleted.Id)) {
+                    let master;
+                    for (let index in this.recurringMasterCache) {
+                        if ((this.recurringMasterCache[index]) && (this.recurringMasterCache[index].id === deleted.Id)) {
                             master = this.recurringMasterCache[index]
                         }
                     }

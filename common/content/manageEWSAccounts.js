@@ -388,7 +388,7 @@ exchWebService.manageEWSAccounts = {
                 folderBase: "publicfoldersroot",
                 folderPath: "/",
                 serverUrl: document.getElementById("exchWebService_server").value
-            }, this.checkServerOK, this.checkServerError)
+            }, this.checkServerOK, this.checkServerError);
         }
         catch (err) {
             window.setCursor("auto");
