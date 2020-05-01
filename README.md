@@ -14,11 +14,11 @@ Exchange Calendar extension can:
   * Manage the Exchange « out of office » feature.
 
 This extension requires:
-  * A recent Thunderbird version up to 59.
+  * Thunderbird between versions 52 and **[up to 59](https://github.com/ExchangeCalendar/exchangecalendar/issues/277)**.
     * See the [releases page](https://github.com/ExchangeCalendar/exchangecalendar/releases)
   for preview builds of ExchangeCalendar version 5 with Thunderbird 60 support.
   * Lightning extension corresponding to the Thunderbird release.
-  * The Exchange server has to provide an Exchange Web Service.
+  * The targeted Exchange server has to provide an Exchange Web Service (EWS).
 
 ExchangeCalendar is developed by a community of interested developers. 
 Support is best effort and cannot be guaranteed. Contributions are welcome.
@@ -29,16 +29,23 @@ Download a pre-built release from our
 [releases page](https://github.com/ExchangeCalendar/exchangecalendar/releases)
 or build your own release as shown below.
 
+## Development status
+
+There is no active development at this time.
+
+### Thunderbird 68 compatibility
+
+Currently not implemented. See issue [#277](https://github.com/ExchangeCalendar/exchangecalendar/issues/277).
+
+A [financial bounty](https://www.bountysource.com/issues/84017522-exchange-calendar-is-incompatible-with-thunderbird-68-2-2) 
+is available for anyone who implements this support. For details and 
+rules see the linked page.
+
 ## Contributing
 
 This add-on was originally created by Michel Verbraak. It is open source and based 
 on the work of many 
 [contributors](https://github.com/ExchangeCalendar/exchangecalendar/graphs/contributors).
-
-### Financial support
-
-If you would like to financially support the maintainer of ExchangeCalendar,
-please consider making a [Patreon donation](https://www.patreon.com/advancingu).
 
 ### Report issues
 
