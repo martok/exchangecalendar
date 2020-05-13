@@ -1577,6 +1577,8 @@ ecnsIAuthPrompt2.prototype = {
                 break;
             case 0x804b0007:
                 this.logInfo("  --- ecnsIAuthPrompt2.onStatus: STATUS_CONNECTING_TO of " + aStatusArg);
+                aRequest.allowSpdy = false;
+                this.logInfo("  --- ecnsIAuthPrompt2.onStatus: have set allowSpdy = " + aRequest.allowSpdy);
                 break;
             case 0x804b0004:
                 this.logInfo("  --- ecnsIAuthPrompt2.onStatus: STATUS_CONNECTED_TO of " + aStatusArg);
