@@ -170,6 +170,7 @@ ExchangeRequest.prototype = {
     do with the observer is reverse the effect of that bug, adding back the calls to asyncPromptAuth
     */
     observe(aSubject, aTopic, aData) {
+        const observerLogging = false;
         let channel = aSubject.QueryInterface(Components.interfaces.nsIHttpChannel);
 
         // Local variables to display URIs in logs according to showPassword preference
@@ -186,23 +187,23 @@ ExchangeRequest.prototype = {
             }
         }
 
-        this.logInfo("ecExchangeRequest observe: http-on-modify-request for URI " + chanURI + ", originalURI " + chanOrigURI);
+        observerLogging && this.logInfo("ecExchangeRequest observe: http-on-modify-request for URI " + chanURI + ", originalURI " + chanOrigURI);
 
         // Only respond to our host
         let myHost = this.xmlReq && this.xmlReq.channel && this.xmlReq.channel.URI.host;
         let theirHost = channel.URI.host;
         if (myHost && (myHost != theirHost)) {
-            this.logInfo("ecExchangeRequest observe: Host does not match, theirs: " + theirHost + " mine: " + myHost);
+            observerLogging && this.logInfo("ecExchangeRequest observe: Host does not match, theirs: " + theirHost + " mine: " + myHost);
             return;
         }
 
         let internalChannel = channel.QueryInterface(Ci.nsIHttpChannelInternal);
         if (internalChannel.blockAuthPrompt) {
-            this.logInfo("ecExchangeRequest observe: unblocking request");
+            observerLogging && this.logInfo("ecExchangeRequest observe: unblocking request");
             internalChannel.blockAuthPrompt = false;
         }
         else {
-            this.logInfo("ecExchangeRequest observe: already unblocked");
+            observerLogging && this.logInfo("ecExchangeRequest observe: already unblocked");
         }
     },
 
