@@ -8766,6 +8766,14 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
                 offset.normalize();
                 tmpStartDate = tmpEndDate.clone();
                 tmpStartDate.addDuration(offset);
+            } else
+            if (offset.inSeconds < 60*60) {
+                if (this.debug) this.logInfo("getOnlyFreeBusyInformation: aRangeStart is less than 1 hour before endrange. Setting endrange to 1 hour after startrange.");
+                var offset = cal.createDuration();
+                offset.hours = 1;
+                offset.normalize();
+                tmpEndDate = tmpStartDate.clone();
+                tmpEndDate.addDuration(offset);
             }
         }
 
