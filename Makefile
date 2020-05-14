@@ -13,7 +13,7 @@ $(xpi): install.rdf defaults/preferences/update.js
 	rm -f $@
 	zip -r $@ -x $(excludefromxpi) -- .
 
-install.rdf: install.rdf.template
+install.rdf: install.rdf.template VERSION
 	sed 's/@VERSION@/$(version)/g' $< > $@
 
 defaults/preferences/update.js:
