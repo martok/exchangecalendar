@@ -7389,9 +7389,9 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         //			return null;
         //		}
 
-        var item = createEvent();
-        //		var item = Cc["@1st-setup.nl/exchange/calendarevent;1"]
-        //				.createInstance(Ci.mivExchangeEvent);
+        //var item = createEvent();
+        var item = Cc["@1st-setup.nl/exchange/calendarevent;1"]
+		    .createInstance(Ci.mivExchangeEvent);
         item.calendar = this.superCalendar;
 
         if (xml2json.getTagValue(aCalendarEvent, "t:BusyType") == "Free") {
