@@ -3093,7 +3093,6 @@ calExchangeCalendar.prototype = {
         //var self = this;
 
         if (this.OnlyShowAvailability) {
-            if (!this.lastValidRangeStart) this.lastValidRangeStart = aRangeStart.clone();
             this.getOnlyFreeBusyInformation(this.lastValidRangeStart, this.lastValidRangeEnd);
         }
         else {
@@ -4350,6 +4349,9 @@ calExchangeCalendar.prototype = {
         this.itemCacheById = {};
         this.itemCacheByStartDate = {};
         this.itemCacheByEndDate = {};
+
+        // Re-evaluate with first request after performStartup()
+        this.OnlyShowAvailability = false;
 
         for (var index in this.recurringMasterCache) {
             if (this.recurringMasterCache[index]) {

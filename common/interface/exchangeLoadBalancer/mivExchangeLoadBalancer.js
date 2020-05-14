@@ -83,7 +83,7 @@ jobObject.prototype = {
 
     onRequestError: function _onRequestError(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, job) {
         //dump(this.server+":jobObject.onRequestError\n");
-        this.loadBalancer.logInfo(this.uuid + ":" + this.server + ":jobObject:onRequestError. arg2:" + arg2 + ", arg3:" + arg3);
+        this.loadBalancer && this.loadBalancer.logInfo(this.uuid + ":" + this.server + ":jobObject:onRequestError. arg2:" + arg2 + ", arg3:" + arg3);
         try {
             arg1.argument.cbError(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
         }
