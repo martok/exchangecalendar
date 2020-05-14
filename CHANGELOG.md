@@ -1,6 +1,16 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [4.1.0] - 2020-05-14
+### Changed
+- Start backport fork for Thunderbird 52.9.1
+- some housekeeping
+
+### Fixed
+- Backport Fix for #206
+- Fix #186 (NTLM over HTTP/2 with Exchange > 2013)
+- Fix #299 (Shared calendars disappear after resets)
+
 ## [4.0.0] - 2018-09-30
 ### Changed
 - Pull latest localization from Transifex
