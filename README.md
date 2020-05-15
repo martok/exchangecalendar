@@ -14,38 +14,35 @@ Exchange Calendar extension can:
   * Manage the Exchange « out of office » feature.
 
 This extension requires:
-  * A recent Thunderbird version up to 59.
+  * A Thunderbird version from 52 up to 59 (inclusive).
   * Lightning extension corresponding to the Thunderbird release.
-  * The Exchange server has to provide an Exchange Web Service.
+  * The targeted Exchange server has to provide an Exchange Web Service (EWS).
 
 This extension was developed by its original author (Michel Verbraak) for
-Exchange 2007, 2010 and 2013.
+Exchange 2007, 2010 and 2013. It is known to work with Exchange 2016.
 
-The ExchangeCalendar community is now maintaining this extension. Support is
-best effort and cannot be guaranteed. Contributions are welcome.
+## Installation
+Download a pre-built release from our [releases page](https://github.com/martok/exchangecalendar/releases)
+or build your own release as shown below.
+
+## Development status
+
+This version is a continuation of development specifically for pre-Quantum versions of Thunderbird.
+It will never be updated to Webextension versions of Thunderbird.
+
+Exchange Calendar is open source and made possible by the work of many [contributors](https://github.com/ExchangeCalendar/exchangecalendar/graphs/contributors).
+
+That project was a community driven effort to develop and maintain the
+"Exchange EWS Provider" extension originally created by Michel Verbraak.
 
 ## Contributing
 
-This add-on is open source and based on the work of many
-[contributors](https://github.com/ExchangeCalendar/exchangecalendar/graphs/contributors).
-
-This project is a community driven effort to develop and maintain the
-"Exchange EWS Provider" extension originally created by Michel Verbraak.
-
 ### Provide feedback, report issue
 
-You are welcome to provide feedback on our Github project:
-https://github.com/ExchangeCalendar/exchangecalendar
+Please report any issues that have not previously been reported
+[here](https://github.com/martok/exchangecalendar/issues). Please also check [upstream](https://github.com/ExchangeCalendar/exchangecalendar/issues).
 
-Please note that the project is built only for latest stable Thunderbird release
-and latest stable Lightning release.
-
-The more information you can provide about an issue, the easier it becomes to
-reproduce and fix. Examples of helpful informations are:
-  * Thunderbird version
-  * Lightning version
-  * Active Thunderbird add-ons
-  * Log output
+Feel free to create issues for requests for backports or links to issues from the upstream project.
 
 ### Get project and build it
 
@@ -86,10 +83,6 @@ repository.
 Please help us to review your code by making multiple small pull
 requests instead of big ones modifying big parts of the code.
 
-### Translate
-
-You are welcome to provide translation updates on our Transifex project:
-https://www.transifex.com/ExchangeCalendar/exchangecalendar
 
 ## License
 
