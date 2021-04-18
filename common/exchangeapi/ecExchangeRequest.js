@@ -402,7 +402,7 @@ ExchangeRequest.prototype = {
         this.xmlReq.setRequestHeader("Connection", "keep-alive");
 
         /* set channel notifications for password processing */
-        this.channelCallbackEcAuthPrompt2 = new ecnsIAuthPrompt2(this);
+        this.channelCallbackEcAuthPrompt2 = new ecnsIAuthPrompt2(this, this.xmlReq.channel);
         this.xmlReq.channel.notificationCallbacks = this.channelCallbackEcAuthPrompt2;
         this.xmlReq.channel.loadGroup = null;
 
@@ -1472,7 +1472,7 @@ ExchangeRequest.prototype = {
 
 var ecPasswordErrorList = {};
 
-function ecnsIAuthPrompt2(aExchangeRequest) {
+function ecnsIAuthPrompt2(aExchangeRequest, aXHRChannel) {
     this.exchangeRequest = aExchangeRequest;
 
     this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
@@ -1483,7 +1483,11 @@ function ecnsIAuthPrompt2(aExchangeRequest) {
     this.context = null;
     this.level = null;
     this.authInfo = null;
-    this.channel = null;
+    // apparently just *holding* the reference to the channel prevents a race condition!?
+    // this is to prevent a bug (that may be a race condition inside nsIHttpChannel) where the JS wrapping would miss
+    // all important interfaces.
+    // this causes allowSpdy to not be accessible in onStatus, which causes authentication errors
+    this.channel = aXHRChannel;
     this.trycount = 0;
 
     this.username = null;
@@ -1577,9 +1581,16 @@ ecnsIAuthPrompt2.prototype = {
                 this.logInfo("  --- ecnsIAuthPrompt2.onStatus: STATUS_RESOLVED of " + aStatusArg);
                 break;
             case 0x804b0007:
-                this.logInfo("  --- ecnsIAuthPrompt2.onStatus: STATUS_CONNECTING_TO of " + aStatusArg);
-                aRequest.allowSpdy = false;
-                this.logInfo("  --- ecnsIAuthPrompt2.onStatus: have set allowSpdy = " + aRequest.allowSpdy);
+                // aRequest and this.channel should be the same object.
+                // a previous bug used to sometimes give aRequest that doesn't have any of the interfaces it should have (see constructor)
+                this.logInfo("  --- ecnsIAuthPrompt2.onStatus: STATUS_CONNECTING_TO of " + aStatusArg + " for request = " + aRequest + " channel = " + this.channel);
+                try {
+                    aRequest.allowSpdy = false;
+                    this.logInfo("  --- ecnsIAuthPrompt2.onStatus: have set allowSpdy = " + aRequest.allowSpdy);
+                }
+                catch(e) {
+                    this.logInfo("  --- ecnsIAuthPrompt2.onStatus: request is not nsIHttpChannelInternal");
+                }
                 break;
             case 0x804b0004:
                 this.logInfo("  --- ecnsIAuthPrompt2.onStatus: STATUS_CONNECTED_TO of " + aStatusArg);
